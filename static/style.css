@@ -120,3 +120,83 @@ a:hover {
         padding: 12px 30px;
     }
 }
+
+
+
+/* Dropdown menu styling */
+select {
+    padding: 10px;
+    margin: 10px 0 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Input boxes */
+input[type="number"] {
+    padding: 10px;
+    margin: 10px 0 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Form labels */
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+/* Form spacing */
+form {
+    margin-top: 20px;
+}
+
+
+/* Difficulty container */
+.difficulty-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.difficulty-box {
+    flex: 1;
+    margin: 0 10px;
+    text-align: center;
+}
+
+.difficulty-box label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.difficulty-box input {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* Warning messages */
+.warning {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    height: 18px;
+    /* Reserve space to avoid layout shift */
+}
+
+.totalWarning {
+    color: #e74c3c;
+    font-size: 16px;
+    margin-top: 20px;
+}

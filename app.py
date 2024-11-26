@@ -54,7 +54,8 @@ def upload_file():
             if char_count > 5000:
                 flash(f'The file contains {char_count} characters, which exceeds the limit.')
             else:
-                flash(f'The file contains {char_count} characters.')
+                flash(f'File uploaded successfully.')
+                return redirect(url_for('questions'))
             
             return redirect(url_for('index'))
         else:
@@ -62,6 +63,39 @@ def upload_file():
             return redirect(request.url)
 
     return render_template('upload.html')
+
+
+
+@app.route('/questions', methods=['GET', 'POST'])
+def questions():
+    if request.method == 'POST':
+        # Get form data
+        question_count = int(request.form.get('question_count'))
+        easy_count = int(request.form.get('easy', 0))
+        medium_count = int(request.form.get('medium', 0))
+        difficult_count = int(request.form.get('difficult', 0))
+
+        # Backend validation
+        errors = []
+        if not (0 <= easy_count <= 10):
+            errors.append('Easy count must be between 0 and 10.')
+        if not (0 <= medium_count <= 10):
+            errors.append('Medium count must be between 0 and 10.')
+        if not (0 <= difficult_count <= 10):
+            errors.append('Difficult count must be between 0 and 10.')
+        if (easy_count + medium_count + difficult_count) != question_count:
+            errors.append('The sum of easy, medium, and difficult counts must equal the total number of questions.')
+
+        # Display errors or proceed
+        if errors:
+            for error in errors:
+                flash(error)
+        else:
+            flash('Questions successfully configured.')
+            return redirect(url_for('index'))
+
+    return render_template('questions.html')
+
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

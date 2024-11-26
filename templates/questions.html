@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Configure Questions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header">EduQ</div>
+    <div class="container">
+        <h1>Number of Questions</h1>
+        <form id="questionForm" method="POST">
+            <!-- Select menu for number of questions -->
+            <label for="question_count">Select the total number of questions:</label>
+            <select name="question_count" id="question_count" required>
+                {% for i in range(1, 11) %}
+                <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+
+            <h2>Configure Difficulty Levels</h2>
+            <div class="difficulty-container">
+                <!-- Easy question count -->
+                <div class="difficulty-box">
+                    <label for="easy">Easy:</label>
+                    <input type="number" id="easy" name="easy" min="0" max="10" required>
+                    <div class="warning" id="easyWarning"></div>
+                </div>
+
+                <!-- Medium question count -->
+                <div class="difficulty-box">
+                    <label for="medium">Medium:</label>
+                    <input type="number" id="medium" name="medium" min="0" max="10" required>
+                    <div class="warning" id="mediumWarning"></div>
+                </div>
+
+                <!-- Difficult question count -->
+                <div class="difficulty-box">
+                    <label for="difficult">Difficult:</label>
+                    <input type="number" id="difficult" name="difficult" min="0" max="10" required>
+                    <div class="warning" id="difficultWarning"></div>
+                </div>
+            </div>
+
+            <div class="totalWarning" id="totalWarning"></div>
+
+            <button type="submit" class="upload-button">Submit</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
