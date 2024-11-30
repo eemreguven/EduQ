@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Configure Questions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header">EduQ</div>
+
+    <div class="container">
+        <h1>Configure Questions</h1>
+    
+        <!-- Warning Message -->
+        <div class="totalWarning" id="totalWarning">Total must be between 1 and 10.</div>
+    
+        <form id="questionForm" method="POST">
+            <!-- Table for Question Types -->
+            <div class="question-types">
+                <div class="question-type-header">
+                    <span>Question Type</span>
+                    <span>Easy</span>
+                    <span>Medium</span>
+                    <span>Difficult</span>
+                </div>
+    
+                <!-- Question Type Rows -->
+                {% for i in range(1, 10) %}
+                <div class="question-type-row">
+                    <span>Question Type {{ i }}</span>
+                    <input type="number" class="question-input" id="easy_{{ i }}" name="easy_{{ i }}" min="0" max="10" value="0">
+                    <input type="number" class="question-input" id="medium_{{ i }}" name="medium_{{ i }}" min="0" max="10" value="0">
+                    <input type="number" class="question-input" id="difficult_{{ i }}" name="difficult_{{ i }}" min="0" max="10" value="0">
+                </div>
+                {% endfor %}
+            </div>
+    
+            <!-- Submit Button -->
+            <button type="submit" id="submitButton" class="upload-button" disabled>Submit</button>
+        </form>
+    </div>
+    
+    
+
+
+
+
+
+
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

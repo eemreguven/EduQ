@@ -1,0 +1,442 @@
+/* General styling */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e8f4f8;
+    /* Soft blue for an educational theme */
+    color: #333;
+}
+
+/* Header (top strip) */
+.header {
+    background-color: #2c3e50;
+    /* Dark blue for the header */
+    color: white;
+    padding: 15px 50px;
+    /* Increased left padding to move "EduQ" away from the edge */
+    font-size: 28px;
+    font-weight: bold;
+    text-align: left;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    /* Subtle shadow */
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+/* Main container */
+.container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    padding: 50px;
+    width: 80%;
+    max-width: 1000px;
+    margin: 150px auto;
+    /* Adjusted margin to push the container lower */
+    text-align: center;
+}
+
+/* Headings */
+h1 {
+    font-size: 42px;
+    /* Bigger text for the main heading */
+    font-weight: bold;
+    color: #2c3e50;
+    /* Dark blue for a professional look */
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    /* Subtle shadow for depth */
+}
+
+p {
+    font-size: 20px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* Upload button */
+.upload-button {
+    background-color: #28a745;
+    /* Green button */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 15px 40px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+    background-color: #218838;
+    /* Darker green on hover */
+}
+
+/* Flash messages */
+/*
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+    color: #e74c3c;
+   
+    font-size: 16px;
+}*/
+
+/* Footer link */
+a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 18px;
+    margin-top: 20px;
+    display: inline-block;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 32px;
+    }
+
+    p {
+        font-size: 18px;
+    }
+
+    .upload-button {
+        font-size: 18px;
+        padding: 12px 30px;
+    }
+}
+
+
+
+/* Dropdown menu styling */
+/*
+select {
+    padding: 10px;
+    margin: 10px 0 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 300px;
+}*/
+
+/* Input boxes */
+input[type="number"] {
+    padding: 10px;
+    margin: 10px 0 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Form labels */
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+/* Form spacing */
+form {
+    margin-top: 20px;
+}
+
+
+/* Difficulty container */
+.difficulty-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.difficulty-box {
+    flex: 1;
+    margin: 0 10px;
+    text-align: center;
+}
+
+.difficulty-box label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.difficulty-box input {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* Warning messages */
+.warning {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    height: 18px;
+    /* Reserve space to avoid layout shift */
+}
+
+.totalWarning {
+    color: #e74c3c;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+/* Difficulty container */
+.difficulty-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.difficulty-box {
+    flex: 1;
+    margin: 0 10px;
+    text-align: center;
+}
+
+.difficulty-box h3 {
+    margin: 10px 0;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+.difficulty-box label {
+    display: block;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.difficulty-box input {
+    width: 80%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* Warnings */
+.warning {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    height: 18px;
+}
+
+.totalWarning {
+    color: #e74c3c;
+    font-size: 16px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Custom file upload label */
+.custom-file-upload {
+    background-color: #17a2b8;
+    /* Teal button */
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.custom-file-upload:hover {
+    background-color: #138496;
+}
+
+/* Smaller upload button */
+.small-upload-button {
+    background-color: #28a745;
+    /* Green button */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    /* Smaller size */
+    font-size: 14px;
+    /* Smaller font */
+    cursor: pointer;
+    display: block;
+    /* Ensures it stays below the file input */
+    margin: 10px auto 0;
+    /* Center it below the file input */
+    transition: background-color 0.3s ease;
+}
+
+.small-upload-button:hover {
+    background-color: #218838;
+}
+
+/* Align container */
+form {
+    text-align: center;
+}
+
+
+
+/* start upload file code*/
+
+/* File upload button */
+.file-upload-label {
+    display: inline-block;
+    background-color: #28a745;
+    /* Green color initially */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    margin-bottom: 20px;
+    /* Add spacing below the button */
+    width: auto;
+    transition: all 0.3s ease;
+}
+
+.file-upload-label:hover {
+    background-color: #218838;
+    /* Darker green on hover */
+}
+
+/* Upload button container */
+.upload-button-container {
+    text-align: center;
+    /* Center the upload button */
+}
+
+/* Upload button */
+.upload-button {
+    background-color: #007bff;
+    /* Blue button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+    /* Aligns well with the centered container */
+    transition: all 0.3s ease;
+}
+
+.upload-button:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+}
+
+/* Updated file label styles when a file is selected */
+input[type="file"]:focus+.file-upload-label {
+    background-color: white;
+    color: gray;
+    border: 1px solid #ccc;
+}
+
+
+/*end of the upload code*/
+
+
+/*start for questions page for questions*/
+/* Question Types Container */
+.question-types {
+    margin-top: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.question-type-header {
+    display: flex;
+    justify-content: space-around;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 10px 0;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.question-type-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.question-type-row span {
+    font-size: 16px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.question-type-row input {
+    width: 60px;
+    height: 40px;
+    font-size: 16px;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+}
+
+/* Warnings */
+.totalWarning {
+    color: #e74c3c;
+    font-size: 16px;
+    margin: 10px 0 20px;
+    /* Space between heading and form */
+    text-align: center;
+    visibility: hidden;
+    /* Default hidden until triggered */
+}
+
+
+/* Submit Button */
+.upload-button {
+    background-color: #28a745;
+    /* Green button */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 15px 40px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.upload-button:disabled {
+    background-color: #ccc;
+    /* Disabled gray color */
+    color: #666;
+    cursor: not-allowed;
+}
+
+/*end for questions page fpr questions*/

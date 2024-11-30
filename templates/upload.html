@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload File</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header">EduQ</div>
+    <div class="container">
+        <h1>Upload Your Educational File</h1>
+        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+            <!-- File input -->
+            <label for="file" class="file-upload-label" id="fileLabel">Choose a File</label>
+            <input type="file" id="file" name="file" accept=".pdf" required style="display: none;">
+
+            <!-- Upload button -->
+            <div class="upload-button-container">
+                <button type="submit" class="upload-button">Upload</button>
+            </div>
+        </form>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
