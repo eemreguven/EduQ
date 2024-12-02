@@ -24,9 +24,9 @@
                 </div>
     
                 <!-- Question Type Rows -->
-                {% for i in range(1, 10) %}
+                {% for question_type in question_types %}
                 <div class="question-type-row">
-                    <span>Question Type {{ i }}</span>
+                    <span>{{ question_type }}</span>
                     <input type="number" class="question-input" id="easy_{{ i }}" name="easy_{{ i }}" min="0" max="10" value="0">
                     <input type="number" class="question-input" id="medium_{{ i }}" name="medium_{{ i }}" min="0" max="10" value="0">
                     <input type="number" class="question-input" id="difficult_{{ i }}" name="difficult_{{ i }}" min="0" max="10" value="0">
@@ -40,11 +40,6 @@
     </div>
     
     
-
-
-
-
-
 
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>

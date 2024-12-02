@@ -31,10 +31,10 @@ body {
     background: white;
     border-radius: 10px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    padding: 50px;
+    padding: 20px;
     width: 80%;
     max-width: 1000px;
-    margin: 150px auto;
+    margin: 100px auto;
     /* Adjusted margin to push the container lower */
     text-align: center;
 }
@@ -46,7 +46,7 @@ h1 {
     font-weight: bold;
     color: #2c3e50;
     /* Dark blue for a professional look */
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     /* Subtle shadow for depth */
 }
@@ -368,41 +368,46 @@ input[type="file"]:focus+.file-upload-label {
 /* Question Types Container */
 .question-types {
     margin-top: 20px;
-    width: 100%;
+    width: 80%; 
     text-align: center;
+    margin: 5px auto;
 }
 
 .question-type-header {
-    display: flex;
-    justify-content: space-around;
+    display: grid; 
+    grid-template-columns: 3fr 1fr 1fr 1fr; 
+    text-align: center; 
     font-weight: bold;
     font-size: 18px;
-    padding: 10px 0;
+    padding: 5px 0;
     border-bottom: 2px solid #ccc;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .question-type-row {
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
     align-items: center;
     margin-bottom: 10px;
 }
 
 .question-type-row span {
+    text-align: center;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: normal;
     color: #2c3e50;
+    padding: 0 10px;
 }
 
 .question-type-row input {
-    width: 60px;
-    height: 40px;
-    font-size: 16px;
-    text-align: center;
-    border-radius: 5px;
+    text-align: center; 
+    width: 40px;
+    height: 25px;
+    font-size: 14px;
+    border-radius: 2px;
     border: 1px solid #ccc;
     background-color: #f9f9f9;
+    margin: 0 auto;
 }
 
 /* Warnings */
@@ -415,7 +420,6 @@ input[type="file"]:focus+.file-upload-label {
     visibility: hidden;
     /* Default hidden until triggered */
 }
-
 
 /* Submit Button */
 .upload-button {

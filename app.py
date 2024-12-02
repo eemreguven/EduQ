@@ -8,6 +8,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with a secure key
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # 1 MB limit
+app.config['CHARACTER_LIMIT'] = 10000
 
 ALLOWED_EXTENSIONS = {'pdf', 'txt', 'doc', 'docx'}
 
@@ -51,7 +52,7 @@ def upload_file():
             file_type = filename.rsplit('.', 1)[1].lower()
             char_count = count_characters(file_path, file_type)
             
-            if char_count > 5000:
+            if char_count > app.config['CHARACTER_LIMIT']:
                 flash(f'The file contains {char_count} characters, which exceeds the limit.')
             else:
                 flash(f'File uploaded successfully.')
@@ -65,9 +66,20 @@ def upload_file():
     return render_template('upload.html')
 
 
-
 @app.route('/questions', methods=['GET', 'POST'])
 def questions():
+    question_types = [
+        "True/False",
+        "Multiple Choice",
+        "Fill-in-the-Blank",
+        "Scenario-Based",
+        "Comparison",
+        "Cause and Effect",
+        "Argument-Based",
+        "Creative Suggestion",
+        "Open-Ended Problem Solving"
+    ]
+    
     if request.method == 'POST':
         # Get form data
         question_count = int(request.form.get('question_count'))
@@ -94,8 +106,7 @@ def questions():
             flash('Questions successfully configured.')
             return redirect(url_for('index'))
 
-    return render_template('questions.html')
-
+    return render_template('questions.html', question_types=question_types)
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
