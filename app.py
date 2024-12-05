@@ -1,113 +1,111 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.utils import secure_filename
-from PyPDF2 import PdfReader
-from docx import Document
 
+from utils import (    allowed_file,
+    count_characters,
+    delete_all_files_in_directory,
+    validate_questions,
+    query_rag,
+    run_script,
+    create_directory_if_not_exists
+)
+from constants import PROMPT_TEMPLATE, ALLOWED_EXTENSIONS, CHROMA_PATH, question_types, prompt_templates
+
+# Flask App Configuration
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Replace with a secure key
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # 1 MB limit
-app.config['CHARACTER_LIMIT'] = 10000
+app.secret_key = 'your_secret_key'
+app.config['UPLOAD_FOLDER'] = 'rag-system/data'
+app.config['DB_FOLDER'] = 'rag-system/chroma'
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB
+app.config['CHARACTER_LIMIT'] = 100000
 
-ALLOWED_EXTENSIONS = {'pdf', 'txt', 'doc', 'docx'}
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def count_characters(file_path, file_type):
-    char_count = 0
-    if file_type == 'txt':
-        with open(file_path, 'r', encoding='utf-8') as f:
-            char_count = len(f.read())
-    elif file_type == 'pdf':
-        reader = PdfReader(file_path)
-        char_count = sum(len(page.extract_text()) for page in reader.pages)
-    elif file_type in {'doc', 'docx'}:
-        doc = Document(file_path)
-        char_count = sum(len(paragraph.text) for paragraph in doc.paragraphs)
-    return char_count
-
+# Flask Routes
 @app.route('/')
 def index():
+    """Render the home page."""
     return render_template('index.html')
+
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
+    """Handle file uploads."""
     if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('No file part')
+        file = request.files.get('file')
+        if not file or file.filename == '':
+            flash('No file selected.')
             return redirect(request.url)
-        
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        
-        if file and allowed_file(file.filename):
+
+        if allowed_file(file.filename, ALLOWED_EXTENSIONS):
             filename = secure_filename(file.filename)
+            delete_all_files_in_directory(app.config['UPLOAD_FOLDER'])
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
-            
+
             file_type = filename.rsplit('.', 1)[1].lower()
             char_count = count_characters(file_path, file_type)
-            
+
             if char_count > app.config['CHARACTER_LIMIT']:
-                flash(f'The file contains {char_count} characters, which exceeds the limit.')
+                flash(f'The file contains {char_count} characters, exceeding the limit.')
             else:
-                flash(f'File uploaded successfully.')
+                flash('File uploaded successfully.')
                 return redirect(url_for('questions'))
-            
-            return redirect(url_for('index'))
-        else:
-            flash('Invalid file type. Only PDF, TXT, DOC, or DOCX allowed.')
-            return redirect(request.url)
+
+        flash('Invalid file type. Only PDF, TXT, DOC, or DOCX are allowed.')
+        return redirect(request.url)
 
     return render_template('upload.html')
 
 
 @app.route('/questions', methods=['GET', 'POST'])
 def questions():
-    question_types = [
-        "True/False",
-        "Multiple Choice",
-        "Fill-in-the-Blank",
-        "Scenario-Based",
-        "Comparison",
-        "Cause and Effect",
-        "Argument-Based",
-        "Creative Suggestion",
-        "Open-Ended Problem Solving"
-    ]
-    
+    """Handle question generation form."""
     if request.method == 'POST':
-        # Get form data
-        question_count = int(request.form.get('question_count'))
-        easy_count = int(request.form.get('easy', 0))
-        medium_count = int(request.form.get('medium', 0))
-        difficult_count = int(request.form.get('difficult', 0))
-
-        # Backend validation
-        errors = []
-        if not (0 <= easy_count <= 10):
-            errors.append('Easy count must be between 0 and 10.')
-        if not (0 <= medium_count <= 10):
-            errors.append('Medium count must be between 0 and 10.')
-        if not (0 <= difficult_count <= 10):
-            errors.append('Difficult count must be between 0 and 10.')
-        if (easy_count + medium_count + difficult_count) != question_count:
-            errors.append('The sum of easy, medium, and difficult counts must equal the total number of questions.')
-
-        # Display errors or proceed
+        question_data, errors = validate_questions(request.form, question_types)
         if errors:
             for error in errors:
                 flash(error)
-        else:
-            flash('Questions successfully configured.')
-            return redirect(url_for('index'))
+            return render_template('questions.html', question_types=question_types)
+
+        try:
+            generated_questions = generate_questions(question_data)
+            for question_tuple in generated_questions:
+                flash(f"{question_tuple[0]}: {question_tuple[1]}")
+        except Exception as e:
+            flash(f"An error occurred while generating questions: {e}")
+            return render_template('questions.html', question_types=question_types)
+        return redirect(url_for('results'))
 
     return render_template('questions.html', question_types=question_types)
 
+
+@app.route('/results', methods=['GET'])
+def results():
+    """Render the results page."""
+    return render_template('results.html')
+
+# Helper Functions
+def generate_questions(question_data):
+    """Generate questions using the RAG system."""
+    # Update the database
+    run_script('populate_database.py', cwd='rag-system')
+
+    generated_questions = []
+    for item in question_data:
+        question_type = item['question_type']
+        for difficulty in ['easy', 'medium', 'difficult']:
+            count = item[difficulty]
+            if count > 0:
+                prompt_template = prompt_templates[question_type][difficulty]
+                for _ in range(count):
+                    question = query_rag(prompt_template, CHROMA_PATH, PROMPT_TEMPLATE)
+                    generated_questions.append(
+                        (f"{question_type} {difficulty.capitalize()}", question)
+                    )
+    return generated_questions
+
+# Run the Application
 if __name__ == '__main__':
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    app.run(host='127.0.0.1', port=5000, debug=True)  # Explicitly setting the host and port
+    create_directory_if_not_exists(app.config['UPLOAD_FOLDER'])
+    app.run(host='127.0.0.1', port=5000, debug=True)

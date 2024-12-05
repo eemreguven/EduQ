@@ -27,11 +27,23 @@
                 {% for question_type in question_types %}
                 <div class="question-type-row">
                     <span>{{ question_type }}</span>
-                    <input type="number" class="question-input" id="easy_{{ i }}" name="easy_{{ i }}" min="0" max="10" value="0">
-                    <input type="number" class="question-input" id="medium_{{ i }}" name="medium_{{ i }}" min="0" max="10" value="0">
-                    <input type="number" class="question-input" id="difficult_{{ i }}" name="difficult_{{ i }}" min="0" max="10" value="0">
+                    <input type="number" class="question-input" 
+                        id="easy_{{ loop.index }}" 
+                        name="easy_{{ loop.index }}" 
+                        min="0" max="10" value="0">
+                
+                    <input type="number" class="question-input" 
+                        id="medium_{{ loop.index }}" 
+                        name="medium_{{ loop.index }}" 
+                        min="0" max="10" value="0">
+                
+                    <input type="number" class="question-input" 
+                        id="difficult_{{ loop.index }}" 
+                        name="difficult_{{ loop.index }}" 
+                        min="0" max="10" value="0">
                 </div>
                 {% endfor %}
+                
             </div>
     
             <!-- Submit Button -->
