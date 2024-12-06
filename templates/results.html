@@ -11,18 +11,26 @@
     <!-- Main Content -->
     <div class="container">
         <h1>Result Questions</h1>
-        <p>
-            Your questions: 
-        </p>
+        <p>Your generated questions are listed below:</p>
+        
+        <!-- Flash Messages -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <ul>
                     {% for message in messages %}
-                        <li>{{ message }}</li>
+                        <p>{{ message }}</p>
                     {% endfor %}
                 </ul>
+            {% else %}
+                <p>No questions generated yet.</p>
             {% endif %}
         {% endwith %}
+
+        <!-- Buttons Section -->
+        <div class="button-container">
+            <a href="{{ url_for('questions') }}" class="button">Create New Quiz</a>
+            <a href="{{ url_for('upload_file') }}" class="button">Upload New Resources</a>
+        </div>
     </div>
 </body>
 </html>
