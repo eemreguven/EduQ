@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from werkzeug.utils import secure_filename
 
 from utils import (    allowed_file,
@@ -8,7 +8,8 @@ from utils import (    allowed_file,
     validate_questions,
     query_rag,
     run_script,
-    create_directory_if_not_exists
+    create_directory_if_not_exists,
+    save_questions_to_docx
 )
 from constants import PROMPT_TEMPLATE, ALLOWED_EXTENSIONS, CHROMA_PATH, question_types, prompt_templates
 
@@ -19,6 +20,7 @@ app.config['UPLOAD_FOLDER'] = 'rag-system/data'
 app.config['DB_FOLDER'] = 'rag-system/chroma'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB
 app.config['CHARACTER_LIMIT'] = 100000
+app.config['DOWNLOAD_FOLDER'] = 'downloads'  # Folder for generated quizzes
 
 
 # Flask Routes
@@ -69,13 +71,13 @@ def questions():
             return render_template('questions.html', question_types=question_types)
 
         try:
-            generated_questions = generate_questions(question_data)
-            for question_tuple in generated_questions:
-                flash(f"{question_tuple[0]}: {question_tuple[1]}")
+            # Generate questions and get the filename of the .docx file
+            filename = generate_questions(question_data)
+            # Redirect to the results page, passing the filename as a query parameter
+            return redirect(url_for('results', filename=filename))
         except Exception as e:
             flash(f"An error occurred while generating questions: {e}")
             return render_template('questions.html', question_types=question_types)
-        return redirect(url_for('results'))
 
     return render_template('questions.html', question_types=question_types)
 
@@ -83,7 +85,20 @@ def questions():
 @app.route('/results', methods=['GET'])
 def results():
     """Render the results page."""
-    return render_template('results.html')
+    filename = request.args.get('filename')  # Get the filename from the query parameters
+    if not filename:
+        flash("No file found to download.")
+        return redirect(url_for('questions'))  # Redirect back to questions if no file
+    return render_template('results.html', filename=filename)
+
+
+from flask import send_from_directory
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    """Serve the generated .docx file for download."""
+    return send_from_directory(app.config['DOWNLOAD_FOLDER'], filename, as_attachment=True)
+
 
 # Helper Functions
 def generate_questions(question_data):
@@ -103,9 +118,13 @@ def generate_questions(question_data):
                     generated_questions.append(
                         (f"{question_type} {difficulty.capitalize()}", question)
                     )
-    return generated_questions
+
+    # Save questions to a .docx file in the download folder
+    filename = save_questions_to_docx(generated_questions, app.config['DOWNLOAD_FOLDER'])
+    return filename
 
 # Run the Application
 if __name__ == '__main__':
     create_directory_if_not_exists(app.config['UPLOAD_FOLDER'])
+    create_directory_if_not_exists(app.config['DOWNLOAD_FOLDER'])
     app.run(host='127.0.0.1', port=5000, debug=True)

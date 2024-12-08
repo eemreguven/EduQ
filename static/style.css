@@ -348,3 +348,47 @@ input[type="file"]:focus+.file-upload-label {
     margin-top: 20px;
     transition: background-color 0.3s ease;
 }
+
+/* Card-style button for download */
+.card-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 320px;
+    height: 100px;
+    margin: 30px auto;
+    background-color: white;
+    color: #007bff;
+    /* Blue text */
+    text-decoration: none;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow */
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+    padding: 20px;
+    border: 2px solid #007bff;
+    /* Blue border */
+}
+
+.card-button:hover {
+    transform: translateY(-5px);
+    /* Slight upward lift on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: #f8f9fa;
+    /* Light gray background on hover */
+    color: #0056b3;
+    /* Darker blue text on hover */
+}
+
+.card-button h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.card-button p {
+    font-size: 16px;
+    margin: 0;
+}

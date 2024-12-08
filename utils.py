@@ -3,6 +3,8 @@ import subprocess
 import sys
 from PyPDF2 import PdfReader
 from docx import Document
+from datetime import datetime
+from docx import Document
 from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
 from langchain_ollama import OllamaLLM
@@ -116,3 +118,28 @@ def run_script(script_name, arguments = "", cwd=None):
         subprocess.run([current_python, script_name], cwd=cwd, check=True)
     else:
         subprocess.run([current_python, script_name, arguments], cwd=cwd, check=True)
+        
+
+# Save Results
+import os
+from datetime import datetime
+from docx import Document
+
+def save_questions_to_docx(questions, download_folder):
+    """Save generated questions to a .docx file."""
+    # Ensure the download folder exists
+    os.makedirs(download_folder, exist_ok=True)
+
+    # Create the .docx file with a timestamped filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"created_quiz_{timestamp}.docx"
+    filepath = os.path.join(download_folder, filename)
+    
+    # Create and save the .docx file
+    doc = Document()
+    doc.add_heading('Generated Quiz', level=1)
+    for question_type, question in questions:
+        doc.add_paragraph(f"{question_type}: {question}")
+    doc.save(filepath)
+    
+    return filename
