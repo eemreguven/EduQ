@@ -211,6 +211,54 @@ form {
     background-color: #0056b3;
 }
 
+/* File Card Styling */
+.file-card {
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.file-card:hover {
+    background-color: #e8f4f8;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.file-card-label {
+    cursor: pointer;
+    display: block;
+}
+
+/* File Name Styling */
+.file-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-top: 10px;
+}
+
+/* Change File Button */
+.upload-button.small {
+    padding: 8px 20px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.upload-button.small:hover {
+    background-color: #0056b3;
+}
+
 /* Align container */
 form {
     text-align: center;

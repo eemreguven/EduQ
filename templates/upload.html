@@ -8,16 +8,27 @@
     <div class="header">EduQ</div>
     <div class="container">
         <h1>Upload Your Educational File</h1>
-        <form id="uploadForm" method="POST" enctype="multipart/form-data">
-            <!-- File input -->
-            <label for="file" class="file-upload-label" id="fileLabel">Choose a File</label>
-            <input type="file" id="file" name="file" accept=".pdf" required style="display: none;">
 
-            <!-- Upload button -->
-            <div class="upload-button-container">
-                <button type="submit" class="upload-button">Upload</button>
+        <!-- Upload Form -->
+        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+            <!-- File Input (Hidden) -->
+            <input type="file" id="fileInput" name="file" accept=".pdf" required style="display: none;">
+
+            <!-- File Card -->
+            <div id="fileCard" class="file-card">
+                <label for="fileInput" class="file-card-label">
+                    <p id="chooseFileText">Choose a File</p>
+                    <p id="selectedFileName" class="file-name" style="display: none;"></p>
+                </label>
+                <button type="button" id="changeFileButton" class="upload-button small" style="display: none;">Change File</button>
+            </div>
+
+            <!-- Upload Button -->
+            <div id="uploadButtonContainer">
+                <button type="submit" class="upload-button">Upload File</button>
             </div>
         </form>
+
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <ul>
@@ -29,6 +40,30 @@
         {% endwith %}
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // JavaScript for dynamic file card display
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const chooseFileText = document.getElementById('chooseFileText');
+            const selectedFileName = document.getElementById('selectedFileName');
+            const changeFileButton = document.getElementById('changeFileButton');
+
+            // Display file name and show "Change File" button when a file is selected
+            fileInput.addEventListener('change', () => {
+                const file = fileInput.files[0];
+                if (file) {
+                    selectedFileName.textContent = `Selected File: ${file.name}`;
+                    selectedFileName.style.display = 'block';
+                    chooseFileText.style.display = 'none'; // Hide "Choose a File" text
+                    changeFileButton.style.display = 'inline-block'; // Show "Change File" button
+                }
+            });
+
+            // Open file selection dialog when "Change File" is clicked
+            changeFileButton.addEventListener('click', () => {
+                fileInput.click(); // Trigger the file input click event
+            });
+        });
+    </script>
 </body>
 </html>
