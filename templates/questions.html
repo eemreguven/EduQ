@@ -1,59 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configure Questions</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/questions.css') }}">
 </head>
 <body>
-    <div class="header">EduQ</div>
+    <!-- Top Header -->
+    <a href="{{ url_for('index') }}" class="header">EduQ</a>
 
-    <div class="container">
-        <h1>Configure Questions</h1>
-    
-        <!-- Warning Message -->
-        <div class="totalWarning" id="totalWarning">Total must be between 1 and 10.</div>
-    
+    <!-- Main Container -->
+    <div id="mainContainer" class="container">
+        <h1 id="mainTitle">Configure Questions</h1>
+
+        <!-- Total Warning -->
+        <div class="totalWarning" id="totalWarning" role="alert" aria-live="assertive" style="visibility: hidden;">
+            Total must be between 1 and 10.
+        </div>
+
+        <!-- Form Section -->
         <form id="questionForm" method="POST">
-            <!-- Table for Question Types -->
-            <div class="question-types">
+            <!-- Question Type Configuration -->
+            <div id="questionTable" class="question-types">
                 <div class="question-type-header">
                     <span>Question Type</span>
                     <span>Easy</span>
                     <span>Medium</span>
                     <span>Difficult</span>
                 </div>
-    
-                <!-- Question Type Rows -->
+
                 {% for question_type in question_types %}
                 <div class="question-type-row">
                     <span>{{ question_type }}</span>
-                    <input type="number" class="question-input" 
-                        id="easy_{{ loop.index }}" 
-                        name="easy_{{ loop.index }}" 
-                        min="0" max="10" value="0">
-                
-                    <input type="number" class="question-input" 
-                        id="medium_{{ loop.index }}" 
-                        name="medium_{{ loop.index }}" 
-                        min="0" max="10" value="0">
-                
-                    <input type="number" class="question-input" 
-                        id="difficult_{{ loop.index }}" 
-                        name="difficult_{{ loop.index }}" 
-                        min="0" max="10" value="0">
+                    <input type="number" class="question-input" id="easy_{{ loop.index }}" 
+                        name="easy_{{ loop.index }}" min="0" max="10" value="0">
+                    <input type="number" class="question-input" id="medium_{{ loop.index }}" 
+                        name="medium_{{ loop.index }}" min="0" max="10" value="0">
+                    <input type="number" class="question-input" id="difficult_{{ loop.index }}" 
+                        name="difficult_{{ loop.index }}" min="0" max="10" value="0">
                 </div>
                 {% endfor %}
-                
             </div>
-    
+
             <!-- Submit Button -->
-            <button type="submit" id="submitButton" class="upload-button" disabled>Submit</button>
+            <div class="submit-container">
+                <button type="submit" id="submitButton" class="upload-button" disabled>
+                    Submit
+                </button>
+            </div>            
         </form>
+
+        <!-- Processing Section -->
+        <div id="processingSection" class="processing-container" style="display: none;">
+            <h2 class="processing-title">Processing Your Request</h2>
+            <div class="loading-spinner"></div>
+            <p id="processingMessage" class="processing-message">Generating questions...</p>
+        </div>
     </div>
-    
-    
 
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/questions.js') }}"></script>
 </body>
 </html>
