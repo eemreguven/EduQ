@@ -1,0 +1,62 @@
+/* --- Card Button --- */
+.card-button {
+    display: block;
+    text-align: center;
+    background-color: #007bff;
+    color: #ffffff;
+    border: 2px solid #007bff; 
+    border-radius: 12px;
+    padding: 30px 15px;
+    margin: 20px auto;
+    max-width: 400px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+/* Hover Effects */
+.card-button:hover {
+    background-color: #0e6cd1; 
+    color: #ffffff;
+    border-color: #0e6cd1;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Active State */
+.card-button:active {
+    background-color: #0e6cd1;
+    border-color: #004085;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(0); /* Push down effect */
+}
+
+.button {
+    background-color: #ffffff;
+    color: #007bff;
+    font-size: 16px;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.button:hover {
+    background-color: #0e6cd1;
+    border: 2px solid #0e6cd1;
+    color: #ffffff;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .card-button {
+        max-width: 90%;
+        padding: 15px 10px;
+        font-size: 16px;
+    }
+
+    .button {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+}

@@ -2,12 +2,13 @@
 <html>
 <head>
     <title>Results</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">    
 </head>
 <body>
     <!-- Top Header -->
-    <div class="header">EduQ</div>
-
+    <a href="{{ url_for('index') }}" class="header">EduQ</a>
+    
     <!-- Main Content -->
     <div class="container">
         <h1>Generated Quiz</h1>
@@ -15,9 +16,8 @@
     
         <!-- Download Quiz Card -->
         <a href="{{ url_for('download_file', filename=request.args.get('filename')) }}" class="card-button">
-            <h2>Download Quiz</h2>
-            <p>Click to download your quiz as a Word file</p>
-        </a>
+            Download your quiz as a Word file
+        </a>        
     
         <!-- Navigation Buttons -->
         <div class="button-container">
