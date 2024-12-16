@@ -27,6 +27,7 @@ from constants import (
 from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
 from langchain_ollama import OllamaLLM
+from progress import progress_data
 
 # Add the 'rag-system' directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'rag-system')))
@@ -380,30 +381,41 @@ def generate_questions(question_data):
 
     Args:
         question_data (list): List of dictionaries containing question configurations.
-        reset_database (bool): Flag to indicate whether to clear the database before populating.
 
     Returns:
         str: The filename of the saved .docx file.
     """
     try:
+        progress_data["status"] = "Populating the database..."
         print("Populating the database without clearing it...")
         run_script('populate_database.py', cwd='rag-system')
 
         generated_questions = []
+        total_questions = sum(item[difficulty] for item in question_data for difficulty in ['easy', 'medium', 'difficult'])
+        current_question = 0
+
+        # Generate questions with progress updates
         for item in question_data:
             question_type = item['question_type']
             for difficulty in ['easy', 'medium', 'difficult']:
                 count = item[difficulty]
                 if count > 0:
                     prompt_template = prompt_templates[question_type][difficulty]
-                    for _ in range(count):
+                    for i in range(count):
+                        current_question += 1
+                        progress_data["status"] = f"Generating question {current_question}/{total_questions} ({question_type} - {difficulty.capitalize()})"
+                        print(progress_data["status"])
+                        
                         question = query_rag(prompt_template, CHROMA_FOLDER_PATH, PROMPT_TEMPLATE)
                         generated_questions.append((f"{question_type} {difficulty.capitalize()}", question))
 
-        # Save the questions to a .docx file
-        return save_questions_to_docx(generated_questions)
+        progress_data["status"] = "Saving generated questions..."
+        filename = save_questions_to_docx(generated_questions)
+        progress_data["status"] = "Questions generated successfully."
+        return filename
 
     except Exception as e:
+        progress_data["status"] = "Error during question generation."
         print(f"Error in generate_questions: {str(e)}")
         raise RuntimeError("Failed to generate questions.")
 
@@ -421,22 +433,16 @@ def query_rag(query_text, chroma_path, prompt_template):
         str: The generated question or an error message.
     """
     try:
-        print("Querying...")
-        print(f"Query text: {query_text}")
+        print(f"Querying... Text: {query_text}")
+
         embedding_function = get_embeddings_function()
         db = Chroma(persist_directory=chroma_path, embedding_function=embedding_function)
 
-        # Log database status before query
-        data = db.get(include=["documents", "metadatas", "embeddings"])
-        print(f"Database contains {len(data['documents'])} documents with embeddings.")
-
         results = db.similarity_search_with_score(query_text, k=5)
-        print(f"Query results: {results}")
 
         if not results:
             return "No relevant context found."
 
-        # Prepare the context
         context_text = "\n\n---\n\n".join([doc.page_content for doc, _ in results])
         prompt = ChatPromptTemplate.from_template(prompt_template).format(
             context=context_text, question=query_text
@@ -446,7 +452,8 @@ def query_rag(query_text, chroma_path, prompt_template):
         return model.invoke(prompt)
 
     except Exception as e:
-        print(f"Error querying RAG system: {str(e)}")
+        progress_data["status"] = f"Error querying RAG system: {str(e)}"
+        print(progress_data["status"])
         return "An error occurred while querying the RAG system."
 
 

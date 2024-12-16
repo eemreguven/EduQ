@@ -3,6 +3,7 @@ from flask import (
     Flask, render_template, request, jsonify, url_for,
     redirect, flash, send_from_directory
 )
+from progress import progress_data
 from methods import (
     clear_folder,
     reset_database,
@@ -20,8 +21,6 @@ from constants import (
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
-
-progress_data = {"status": "idle"}
 
 @app.route('/')
 def index():
@@ -96,7 +95,6 @@ def questions():
             filename = generate_questions(question_data)
             progress_data["status"] = "Questions generated successfully."
 
-            # Return JSON with redirect URL
             return jsonify({
                 "success": True,
                 "redirect_url": url_for('results', filename=filename)
