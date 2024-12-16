@@ -1,7 +1,0 @@
-pypdf
-langchain
-langchain_community
-chromadb
-pytest
-langchain-ollama
-langchain-chroma
