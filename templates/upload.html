@@ -1,69 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Upload File</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Resource</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
 </head>
 <body>
-    <div class="header">EduQ</div>
-    <div class="container">
-        <h1>Upload Your Educational File</h1>
+    <!-- Top Header -->
+    <a href="{{ url_for('index') }}" class="header">EduQ</a>
 
-        <!-- Upload Form -->
-        <form id="uploadForm" method="POST" enctype="multipart/form-data">
-            <!-- File Input (Hidden) -->
-            <input type="file" id="fileInput" name="file" accept=".pdf" required style="display: none;">
+    <!-- Main Container -->
+    <div id="mainContainer" class="container">
+        <h1 id="mainTitle">Upload Your Resource</h1>
 
-            <!-- File Card -->
+        <!-- Form Section -->
+        <form id="uploadForm" action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data"> 
+            <!-- Resource Type Selection -->
+            <div class="resource-type-container">
+                <div class="resource-type-option">
+                    <input type="radio" id="fileRadio" name="resourceType" value="file" checked>
+                    <label for="fileRadio">Text File</label>
+                </div>
+                <div class="resource-type-option">
+                    <input type="radio" id="youtubeRadio" name="resourceType" value="youtube">
+                    <label for="youtubeRadio">YouTube Video</label>
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
             <div id="fileCard" class="file-card">
-                <label for="fileInput" class="file-card-label">
-                    <p id="chooseFileText">Choose a File</p>
+                <label for="fileInput" class="file-card-label" id="fileCardLabel">
+                    <input type="file" id="fileInput" name="file" accept=".pdf,.txt,.doc,.docx" style="display: none;">
                     <p id="selectedFileName" class="file-name" style="display: none;"></p>
+                    <p id="chooseFileText" class="change-file-text">Upload a file</p>
                 </label>
-                <button type="button" id="changeFileButton" class="upload-button small" style="display: none;">Change File</button>
             </div>
 
-            <!-- Upload Button -->
-            <div id="uploadButtonContainer">
-                <button type="submit" class="upload-button">Upload File</button>
+            <!-- YouTube URL Input Section -->
+            <div id="youtubeInputContainer" class="youtube-card" style="display: none;">
+                <label for="youtubeUrl">Enter YouTube URL:</label>
+                <input type="url" id="youtubeUrl" name="youtubeUrl" placeholder="https://youtube.com/..." pattern="https?://.*" required>
             </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="upload-button">Submit</button>
         </form>
 
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul>
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+        <!-- Processing Section -->
+        <div id="processingSection" class="processing-container" style="display: none;">
+            <h2 class="processing-title">Processing Your Request</h2>
+            <div class="loading-spinner"></div> <!-- Spinner -->
+            <p id="processingMessage" class="processing-message">Please wait...</p>
+        </div>
     </div>
 
-    <script>
-        // JavaScript for dynamic file card display
-        document.addEventListener('DOMContentLoaded', () => {
-            const fileInput = document.getElementById('fileInput');
-            const chooseFileText = document.getElementById('chooseFileText');
-            const selectedFileName = document.getElementById('selectedFileName');
-            const changeFileButton = document.getElementById('changeFileButton');
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <p id="errorMessage">Error message goes here.</p>
+        </div>
+    </div>
 
-            // Display file name and show "Change File" button when a file is selected
-            fileInput.addEventListener('change', () => {
-                const file = fileInput.files[0];
-                if (file) {
-                    selectedFileName.textContent = `Selected File: ${file.name}`;
-                    selectedFileName.style.display = 'block';
-                    chooseFileText.style.display = 'none'; // Hide "Choose a File" text
-                    changeFileButton.style.display = 'inline-block'; // Show "Change File" button
-                }
-            });
-
-            // Open file selection dialog when "Change File" is clicked
-            changeFileButton.addEventListener('click', () => {
-                fileInput.click(); // Trigger the file input click event
-            });
-        });
-    </script>
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 </body>
 </html>
