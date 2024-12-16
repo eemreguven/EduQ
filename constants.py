@@ -10,7 +10,11 @@ Answer the question based on the above context: {question}
 
 ALLOWED_EXTENSIONS = {'pdf', 'txt', 'doc', 'docx'}
 
-CHROMA_PATH = "rag-system\chroma"
+CHROMA_FOLDER_PATH = "rag-system\chroma"
+UPLOAD_FOLDER_PATH = "rag-system\data"
+DOWNLOAD_FOLDER_PATH = "downloads"
+MAX_CONTENT_LENGTH =  5 * 1024 * 1024
+CHARACTER_LIMIT = 100000
 
 question_types = [
         "True/False",

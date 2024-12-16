@@ -1,130 +1,147 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
-from werkzeug.utils import secure_filename
-
-from utils import (    allowed_file,
-    count_characters,
-    delete_all_files_in_directory,
-    validate_questions,
-    query_rag,
-    run_script,
-    create_directory_if_not_exists,
-    save_questions_to_docx
+from flask import (
+    Flask, render_template, request, jsonify, url_for,
+    redirect, flash, send_from_directory
 )
-from constants import PROMPT_TEMPLATE, ALLOWED_EXTENSIONS, CHROMA_PATH, question_types, prompt_templates
+from methods import (
+    clear_folder,
+    reset_database,
+    validate_questions,
+    generate_questions,
+    handle_file_upload,
+    handle_youtube_upload,
+)
+from constants import (
+    CHROMA_FOLDER_PATH,
+    DOWNLOAD_FOLDER_PATH,
+    UPLOAD_FOLDER_PATH,
+    question_types
+)
 
-# Flask App Configuration
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
-app.config['UPLOAD_FOLDER'] = 'rag-system/data'
-app.config['DB_FOLDER'] = 'rag-system/chroma'
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB
-app.config['CHARACTER_LIMIT'] = 100000
-app.config['DOWNLOAD_FOLDER'] = 'downloads'  # Folder for generated quizzes
 
+progress_data = {"status": "idle"}
 
-# Flask Routes
 @app.route('/')
 def index():
-    """Render the home page."""
+    """
+    Render the home page.
+    """
     return render_template('index.html')
 
+@app.route('/progress')
+def progress():
+    """
+    Provide real-time progress updates as JSON.
+    """
+    return jsonify(progress_data)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    """Handle file uploads."""
+    """
+    Handle file or YouTube URL uploads.
+
+    - GET: Clear upload folder, reset database, and render upload form.
+    - POST: Process file uploads or YouTube URLs.
+    """
+    if request.method == 'GET':
+        clear_folder(UPLOAD_FOLDER_PATH)
+        reset_database()
+        progress_data["status"] = "idle"
+        return render_template('upload.html')
+
     if request.method == 'POST':
-        file = request.files.get('file')
-        if not file or file.filename == '':
-            flash('No file selected.')
-            return redirect(request.url)
+        try:
+            resource_type = request.form.get('resourceType')
 
-        if allowed_file(file.filename, ALLOWED_EXTENSIONS):
-            filename = secure_filename(file.filename)
-            delete_all_files_in_directory(app.config['UPLOAD_FOLDER'])
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
+            if resource_type == 'file':
+                progress_data["status"] = "Processing file..."
+                response = handle_file_upload(request.files.get('file'))
+                progress_data["status"] = "File processing completed."
+                return response
 
-            file_type = filename.rsplit('.', 1)[1].lower()
-            char_count = count_characters(file_path, file_type)
+            elif resource_type == 'youtube':
+                progress_data["status"] = "Extracting text from YouTube video..."
+                response = handle_youtube_upload(request.form.get('youtubeUrl'))
+                progress_data["status"] = "Text extraction from YouTube video completed."
+                return response
 
-            if char_count > app.config['CHARACTER_LIMIT']:
-                flash(f'The file contains {char_count} characters, exceeding the limit.')
-            else:
-                flash('File uploaded successfully.')
-                return redirect(url_for('questions'))
-
-        flash('Invalid file type. Only PDF, TXT, DOC, or DOCX are allowed.')
-        return redirect(request.url)
-
-    return render_template('upload.html')
-
+            return jsonify({'error': 'Invalid resource type. Supported types: file, youtube.'}), 400
+        except Exception as e:
+            progress_data["status"] = "Error occurred during processing."
+            print(f"Error in /upload route: {str(e)}")
+            return jsonify({'error': 'An unexpected server error occurred.'}), 500
 
 @app.route('/questions', methods=['GET', 'POST'])
 def questions():
-    """Handle question generation form."""
+    """
+    Handle question generation based on user input.
+
+    - GET: Render the question input form.
+    - POST: Validate input, generate questions, and return JSON response.
+    """
+    if request.method == 'GET':
+        return render_template('questions.html', question_types=question_types)
+
     if request.method == 'POST':
-        question_data, errors = validate_questions(request.form, question_types)
-        if errors:
-            for error in errors:
-                flash(error)
-            return render_template('questions.html', question_types=question_types)
-
         try:
-            # Generate questions and get the filename of the .docx file
+            progress_data["status"] = "Validating input..."
+            question_data, errors = validate_questions(request.form)
+            if errors:
+                progress_data["status"] = "Validation errors."
+                return jsonify({"success": False, "errors": errors}), 400
+
+            progress_data["status"] = "Generating questions..."
             filename = generate_questions(question_data)
-            # Redirect to the results page, passing the filename as a query parameter
-            return redirect(url_for('results', filename=filename))
+            progress_data["status"] = "Questions generated successfully."
+
+            # Return JSON with redirect URL
+            return jsonify({
+                "success": True,
+                "redirect_url": url_for('results', filename=filename)
+            })
+
         except Exception as e:
-            flash(f"An error occurred while generating questions: {e}")
-            return render_template('questions.html', question_types=question_types)
-
-    return render_template('questions.html', question_types=question_types)
-
+            progress_data["status"] = "Error during question generation."
+            print(f"Error in /questions route: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": f"An unexpected error occurred: {str(e)}"
+            }), 500
 
 @app.route('/results', methods=['GET'])
 def results():
-    """Render the results page."""
-    filename = request.args.get('filename')  # Get the filename from the query parameters
+    """
+    Render the results page with a download link for the generated file.
+    Redirect to the questions page if no file is found.
+    """
+    filename = request.args.get('filename')
     if not filename:
         flash("No file found to download.")
-        return redirect(url_for('questions'))  # Redirect back to questions if no file
+        return redirect(url_for('questions'))
     return render_template('results.html', filename=filename)
-
-
-from flask import send_from_directory
 
 @app.route('/download/<filename>')
 def download_file(filename):
-    """Serve the generated .docx file for download."""
-    return send_from_directory(app.config['DOWNLOAD_FOLDER'], filename, as_attachment=True)
+    """
+    Allow users to download the generated .docx file.
+    """
+    return send_from_directory(
+        DOWNLOAD_FOLDER_PATH,
+        filename,
+        as_attachment=True
+    )
 
-
-# Helper Functions
-def generate_questions(question_data):
-    """Generate questions using the RAG system."""
-    # Update the database
-    run_script('populate_database.py', cwd='rag-system')
-
-    generated_questions = []
-    for item in question_data:
-        question_type = item['question_type']
-        for difficulty in ['easy', 'medium', 'difficult']:
-            count = item[difficulty]
-            if count > 0:
-                prompt_template = prompt_templates[question_type][difficulty]
-                for _ in range(count):
-                    question = query_rag(prompt_template, CHROMA_PATH, PROMPT_TEMPLATE)
-                    generated_questions.append(
-                        (f"{question_type} {difficulty.capitalize()}", question)
-                    )
-
-    # Save questions to a .docx file in the download folder
-    filename = save_questions_to_docx(generated_questions, app.config['DOWNLOAD_FOLDER'])
-    return filename
-
-# Run the Application
 if __name__ == '__main__':
-    create_directory_if_not_exists(app.config['UPLOAD_FOLDER'])
-    create_directory_if_not_exists(app.config['DOWNLOAD_FOLDER'])
+    if os.path.exists(UPLOAD_FOLDER_PATH):
+        clear_folder(UPLOAD_FOLDER_PATH)
+    else:
+        os.makedirs(UPLOAD_FOLDER_PATH, exist_ok=True)
+
+    if os.path.exists(CHROMA_FOLDER_PATH):
+        reset_database()
+    else:
+        os.makedirs(CHROMA_FOLDER_PATH, exist_ok=True)
+
     app.run(host='127.0.0.1', port=5000, debug=True)
