@@ -386,8 +386,8 @@ def generate_questions(question_data):
         str: The filename of the saved .docx file.
     """
     try:
-        progress_data["status"] = "Populating the database..."
-        print("Populating the database without clearing it...")
+        progress_data["status"] = "Updating the resource database..."
+        print("Populating the database...")
         run_script('populate_database.py', cwd='rag-system')
 
         generated_questions = []
@@ -400,14 +400,20 @@ def generate_questions(question_data):
             for difficulty in ['easy', 'medium', 'difficult']:
                 count = item[difficulty]
                 if count > 0:
-                    prompt_template = prompt_templates[question_type][difficulty]
+                    # Combine question_format and difficulty prompt
+                    question_format = prompt_templates[question_type]["question_format"]
+                    difficulty_prompt = prompt_templates[question_type][difficulty]
+
+                    prompt_template = f"{question_format}\n\n{difficulty_prompt}"
+
                     for i in range(count):
                         current_question += 1
                         progress_data["status"] = f"Generating question {current_question}/{total_questions} ({question_type} - {difficulty.capitalize()})"
                         print(progress_data["status"])
-                        
-                        question = query_rag(prompt_template, CHROMA_FOLDER_PATH, PROMPT_TEMPLATE)
-                        generated_questions.append((f"{question_type} {difficulty.capitalize()}", question))
+
+                        question_response = query_rag(prompt_template, CHROMA_FOLDER_PATH, PROMPT_TEMPLATE)
+                        print(question_response)
+                        generated_questions.append((f"{question_type} {difficulty.capitalize()}", question_response))
 
         progress_data["status"] = "Saving generated questions..."
         filename = save_questions_to_docx(generated_questions)
@@ -457,12 +463,12 @@ def query_rag(query_text, chroma_path, prompt_template):
         return "An error occurred while querying the RAG system."
 
 
-def save_questions_to_docx(questions):
+def save_questions_to_docx(questions_and_answers):
     """
-    Save generated questions to a .docx file.
+    Save processed questions and answers to a .docx file.
 
     Args:
-        questions (list): A list of tuples containing question type and question text.
+        questions_and_answers (list): A list of tuples containing question type, question text, and answer.
 
     Returns:
         str: The filename of the saved .docx file.
@@ -473,17 +479,18 @@ def save_questions_to_docx(questions):
         filename = f"quiz_{timestamp}.docx"
         filepath = os.path.join(DOWNLOAD_FOLDER_PATH, filename)
 
-        # Write questions to the .docx file
+        # Write to .docx
         doc = Document()
-        doc.add_heading('Generated Questions', level=1)
-        for question_type, question in questions:
-            doc.add_paragraph(f"{question_type}: {question}")
-        doc.save(filepath)
+        doc.add_heading('Generated Questions', level=2)
 
+        for idx, (question_type, questions_and_answer) in enumerate(questions_and_answers, 1):
+            doc.add_paragraph(f"{idx}-)({question_type}) {questions_and_answer}")
+        doc.save(filepath)
         return filename
     except Exception as e:
         print(f"Error saving questions to DOCX: {str(e)}")
         raise RuntimeError("Failed to save questions to file.")
+
 
 
 def reset_database(chroma_path=CHROMA_FOLDER_PATH):
