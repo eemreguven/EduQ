@@ -504,7 +504,7 @@ def reset_database(chroma_path=CHROMA_FOLDER_PATH):
         # Connect to the Chroma database
         db = Chroma(persist_directory=chroma_path, embedding_function=get_embeddings_function())
 
-        
+
         db.reset_collection()
     except Exception as e:
         print(f"Error deleting all entries from Chroma: {e}")
@@ -547,7 +547,6 @@ def run_script(script_name, arguments="", cwd=None):
     except subprocess.CalledProcessError as e:
         print(f"Error running script '{script_name}': {str(e)}")
         raise RuntimeError(f"Script execution failed: {script_name}")
-
 
 #--------------------------------------------------------------------------------------------#
 

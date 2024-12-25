@@ -132,14 +132,7 @@ def download_file(filename):
     )
 
 if __name__ == '__main__':
-    if os.path.exists(UPLOAD_FOLDER_PATH):
-        clear_folder(UPLOAD_FOLDER_PATH)
-    else:
-        os.makedirs(UPLOAD_FOLDER_PATH, exist_ok=True)
-
-    if os.path.exists(CHROMA_FOLDER_PATH):
-        reset_database()
-    else:
-        os.makedirs(CHROMA_FOLDER_PATH, exist_ok=True)
+    os.makedirs(UPLOAD_FOLDER_PATH, exist_ok=True)
+    os.makedirs(CHROMA_FOLDER_PATH, exist_ok=True)
 
     app.run(host='127.0.0.1', port=5000, debug=True)

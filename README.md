@@ -1,42 +1,130 @@
 
-# EduQ - Quiz Generator
+# EduQ: LLM Based Quiz Generation System
 
-EduQ is a web-based application designed to streamline the creation of quizzes. Users can upload files (PDFs, DOCX, or TXT) and configure the number of questions for each difficulty level (Easy, Medium, Difficult) and question type. The application provides an intuitive interface and dynamic validation to ensure accurate configuration.
+![System Workflow](./system-workflow.png)
+
+EduQ is an innovative web-based application that simplifies quiz creation using advanced AI techniques. Designed for educators, it leverages state-of-the-art language models to automate the generation of high-quality, context-aware quizzes, saving time and improving learning outcomes.
+
+---
 
 ## Features
-- Upload files (PDF, DOCX, TXT) up to **1MB**.
-- Dynamically configure quiz questions by difficulty levels: Easy, Medium, and Difficult.
-- Real-time validation of input values to ensure consistency.
-- Submit button activation only when the total is valid (1-10).
-- Responsive and user-friendly design.
 
-## Requirements
-The project requires the following Python packages to work:
-- `Flask`
-- `Flask-WTF`
-- `WTForms`
-- `python-docx`
-- `PyPDF2`
-- `lxml`
+- **Powered by Advanced AI**: Utilizes **LLaMA 3.2: 3B** with **Ollama** integration to generate accurate and tailored quiz questions.
+- **Retrieval-Augmented Generation (RAG)**: Employs a RAG system using **LangChain** and related libraries to retrieve relevant context from uploaded materials, ensuring quiz questions align with the source content.
+- **Multiple Input Formats**: Supports **PDF, DOCX, TXT files**, and **YouTube URLs** for quiz material uploads.
+- **Bloom’s Taxonomy Integration**: Generates questions across three educational levels (Easy, Medium, Hard), guided by Bloom's Taxonomy.
+- **Dynamic User Configuration**: Allows customization of question types and difficulty levels with real-time validation to ensure accurate input.
+- **Structured Output**: Provides standardized quiz formats for easy usage.
+- **Responsive Web Application**: Ensures a smooth and user-friendly experience, with dynamic progress updates.
 
-You can install all dependencies using the provided `requirements.txt` file.
+---
 
-## Installation, Usage, and Commands
-```bash
+## Installation
 
-# Install required Python packages
-pip install -r requirements.txt
+### Step 1: Set Up Anaconda Environment
 
-# Run the Flask application
-python app.py
+1. **Create a new Anaconda environment**:
 
-# Open your browser and navigate to:
-http://127.0.0.1:5000/
+   ```bash
+   conda create --name eduq python=3.11
+   conda activate eduq
+   ```
 
-# Interact with the application:
-# - Upload a file using the "Choose a File" button.
-# - Configure quiz questions by setting the number of Easy, Medium, and Difficult questions for each question type.
-# - Ensure your inputs are valid (total between 1-10) to activate the Submit button.
+2. **Install required packages**:
 
-# Stop the Flask application
-# Press Ctrl+C in the terminal to stop the server.
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Step 2: Clone the Repository
+
+   ```bash
+   git clone https://github.com/eemreguven/EduQ.git
+   cd EduQ
+   ```
+
+### Step 3: Run the Application
+
+   ```bash
+   python app.py
+   ```
+
+---
+
+## Usage
+
+1. **Access the Web Interface**:
+
+   Open your web browser and navigate to `http://127.0.0.1:5000/`.
+
+2. **Generate Quizzes**:
+
+   - Upload educational content in supported formats (PDF, DOCX, TXT, or YouTube URL).
+   - Configure quiz parameters, including question types and difficulty levels.
+   - Submit your settings and receive the generated quiz.
+
+---
+
+## System Architecture
+
+- **AI Model**: Utilizes **LLaMA 3.2: 3B** via Ollama for efficient and context-aware question generation.
+- **RAG System**:
+  - Integrates **LangChain**, **LangChain-Ollama**, and **LangChain-Chroma** to retrieve and process relevant content from uploaded materials.
+  - Uses **LangChain-Text-Splitters** for document segmentation to enhance AI performance.
+- **Prompt Design**:
+  - Based on Bloom’s Taxonomy, with standardized question formats for Easy, Medium, and Hard difficulty levels.
+  - Modular prompts to ensure consistency and scalability.
+
+---
+
+## Project Structure
+
+```
+EduQ/
+├── app.py              # Main application logic
+├── constants.py        # Predefined constants and settings
+├── methods.py          # Core functions for file processing and quiz generation
+├── progress.py         # Progress tracking utilities
+├── requirements.txt    # List of required Python packages
+├── templates/          # HTML templates for web pages
+├── static/             # Static assets (CSS, JS, etc.)
+└── rag-system/         # Retrieval-Augmented Generation components
+```
+
+---
+
+## Dependencies
+
+All dependencies are listed in `requirements.txt`. Below are the key libraries used:
+
+- Flask
+- PyPDF2
+- pypdf
+- python-docx
+- reportlab
+- youtube-transcript-api
+- langchain
+- langchain-ollama
+- langchain-chroma
+- langchain-community
+- langchain-text-splitters
+- Werkzeug
+
+---
+
+## Contributing
+
+Contributions are welcome! Fork the repository, create a branch for your feature or fix, and submit a pull request.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+## Contact
+
+For inquiries or support, please open an issue on the [GitHub repository](https://github.com/eemreguven/EduQ).
+

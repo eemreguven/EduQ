@@ -45,7 +45,8 @@ prompt_templates = {
                     B) [Option 2]
                     C) [Option 3]
                     D) [Option 4]
-            - Answer: [Correct option letter, e.g., A)]""",
+                    E) [Option 5]
+            - Answer: [Correct option]""",
         "easy": "Create a multiple-choice question with one correct answer and three simple distractors, focusing on basic facts based on the context provided.",
         "medium": "Write a multiple-choice question that tests the reader's understanding of concepts based on the context provided. Include one correct answer and three plausible distractors that require careful thought.",
         "difficult": "Generate a complex multiple-choice question that requires the reader to apply knowledge or analyze a concept based on the context provided. Include subtle distractors.",
