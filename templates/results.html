@@ -4,10 +4,16 @@
     <title>Results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/icon.png') }}">
 </head>
 <body>
     <!-- Top Header -->
-    <a href="{{ url_for('index') }}" class="header">EduQ</a>
+    <a href="{{ url_for('index') }}" class="header" style="display: flex; align-items: center; text-decoration: none;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" 
+        style="height: 50px; width: 50px; margin-right: 15px; border-radius: 5px;">
+        <span style="font-size: 1.5em;">EduQ</span>
+    </a>
     
     <!-- Main Content -->
     <div class="container">
