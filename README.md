@@ -1,4 +1,3 @@
-
 # EduQ: LLM Based Quiz Generation System
 
 ![System Workflow](./system-workflow.png)
@@ -13,6 +12,7 @@ EduQ is an innovative web-based application that simplifies quiz creation using 
 - **Retrieval-Augmented Generation (RAG)**: Employs a RAG system using **LangChain** and related libraries to retrieve relevant context from uploaded materials, ensuring quiz questions align with the source content.
 - **Multiple Input Formats**: Supports **PDF, DOCX, TXT files**, and **YouTube URLs** for quiz material uploads.
 - **Bloom’s Taxonomy Integration**: Generates questions across three educational levels (Easy, Medium, Hard), guided by Bloom's Taxonomy.
+- **Dynamic Prompting**: Leverages an LLM to dynamically create custom prompt templates based on document context and user-defined parameters, enhancing question relevance and diversity while extending the principles of Bloom’s Taxonomy.
 - **Dynamic User Configuration**: Allows customization of question types and difficulty levels with real-time validation to ensure accurate input.
 - **Structured Output**: Provides standardized quiz formats for easy usage.
 - **Responsive Web Application**: Ensures a smooth and user-friendly experience, with dynamic progress updates.
@@ -36,14 +36,28 @@ EduQ is an innovative web-based application that simplifies quiz creation using 
    pip install -r requirements.txt
    ```
 
-### Step 2: Clone the Repository
+### Step 2: Download and Set Up Ollama
+
+1. **Download and install Ollama**:  
+   Follow the instructions on the [Ollama website](https://ollama.com/) to download and install the Ollama software compatible with your operating system.
+
+2. **Install the LLaMA model in Ollama**:  
+   After setting up Ollama, use the following command to install the LLaMA model:  
+
+   ```bash
+   ollama pull llama2:3b
+   ```
+
+   Ensure the model is successfully installed before proceeding.
+
+### Step 3: Clone the Repository
 
    ```bash
    git clone https://github.com/eemreguven/EduQ.git
    cd EduQ
    ```
 
-### Step 3: Run the Application
+### Step 4: Run the Application
 
    ```bash
    python app.py
@@ -61,6 +75,7 @@ EduQ is an innovative web-based application that simplifies quiz creation using 
 
    - Upload educational content in supported formats (PDF, DOCX, TXT, or YouTube URL).
    - Configure quiz parameters, including question types and difficulty levels.
+   - Dynamically creates tailored prompts based on uploaded content and user-selected configurations, ensuring highly relevant and accurate questions.
    - Submit your settings and receive the generated quiz.
 
 ---
@@ -73,7 +88,9 @@ EduQ is an innovative web-based application that simplifies quiz creation using 
   - Uses **LangChain-Text-Splitters** for document segmentation to enhance AI performance.
 - **Prompt Design**:
   - Based on Bloom’s Taxonomy, with standardized question formats for Easy, Medium, and Hard difficulty levels.
-  - Modular prompts to ensure consistency and scalability.
+  - **Dynamic Prompting**:
+    - Automatically generates custom prompts using the document context and user-defined parameters such as question type and difficulty.
+    - Enhances flexibility and adaptability in generating relevant and contextually accurate quiz questions while reinforcing Bloom’s Taxonomy principles.
 
 ---
 
