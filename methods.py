@@ -16,13 +16,14 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from werkzeug.utils import secure_filename
 from constants import (
-    PROMPT_TEMPLATE, 
+    PROMPT_TEMPLATE_FOR_QUESTIONS,
+    PROMPT_TEMPLATE_FOR_PROMPTS, 
     ALLOWED_EXTENSIONS, 
     CHROMA_FOLDER_PATH,
     UPLOAD_FOLDER_PATH, 
     DOWNLOAD_FOLDER_PATH,
     question_types, 
-    prompt_templates
+    example_prompt_templates
 )
 from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
@@ -390,29 +391,28 @@ def generate_questions(question_data):
         print("Populating the database...")
         run_script('populate_database.py', cwd='rag-system')
 
+        progress_data["status"] = f"Generating summary of documents to create dynamic prompts."
+        print(progress_data["status"])
+        summary = get_summary_of_all_documents()
+
         generated_questions = []
         total_questions = sum(item[difficulty] for item in question_data for difficulty in ['easy', 'medium', 'difficult'])
         current_question = 0
-
+                
         # Generate questions with progress updates
         for item in question_data:
             question_type = item['question_type']
             for difficulty in ['easy', 'medium', 'difficult']:
                 count = item[difficulty]
                 if count > 0:
-                    # Combine question_format and difficulty prompt
-                    question_format = prompt_templates[question_type]["question_format"]
-                    difficulty_prompt = prompt_templates[question_type][difficulty]
-
-                    prompt_template = f"{question_format}\n\n{difficulty_prompt}"
-
-                    for i in range(count):
+                    for _ in range(count):
                         current_question += 1
                         progress_data["status"] = f"Generating question {current_question}/{total_questions} ({question_type} - {difficulty.capitalize()})"
                         print(progress_data["status"])
-
-                        question_response = query_rag(prompt_template, CHROMA_FOLDER_PATH, PROMPT_TEMPLATE)
-                        print(question_response)
+                        
+                        # Generate dynamic query and fetch the question response
+                        dynamic_query =  create_dynamic_query(summary, question_type, difficulty)
+                        question_response = query_rag(dynamic_query)
                         generated_questions.append((f"{question_type} {difficulty.capitalize()}", question_response))
 
         progress_data["status"] = "Saving generated questions..."
@@ -426,7 +426,7 @@ def generate_questions(question_data):
         raise RuntimeError("Failed to generate questions.")
 
 
-def query_rag(query_text, chroma_path, prompt_template):
+def query_rag(query_text, chroma_path=CHROMA_FOLDER_PATH, prompt_template=PROMPT_TEMPLATE_FOR_QUESTIONS):
     """
     Query the RAG system for context-based answers.
 
@@ -462,6 +462,100 @@ def query_rag(query_text, chroma_path, prompt_template):
         print(progress_data["status"])
         return "An error occurred while querying the RAG system."
 
+def create_dynamic_query(summary, question_type, difficulty, chroma_path=CHROMA_FOLDER_PATH, prompt_template=PROMPT_TEMPLATE_FOR_PROMPTS):
+    """
+    Create a dynamic query using the document summary, question type, and difficulty.
+
+    Args:
+        summary (str): A summary of the document context.
+        question_type (str): The type of question (e.g., "True/False", "Multiple Choice").
+        difficulty (str): The difficulty level (e.g., "easy", "medium", "difficult").
+        chroma_path (str): Path to the Chroma database.
+        prompt_template (str): Template to guide LLM in generating the query.
+
+    Returns:
+        str: A formatted query for generating questions.
+    """
+    try:        
+        # Get the example prompt for the question type and difficulty
+        example_prompt = example_prompt_templates[question_type][difficulty]
+        question_base = f"{question_type}-{difficulty}"
+        
+        # Retrieve relevant contexts from the database
+        embedding_function = get_embeddings_function()
+        db = Chroma(persist_directory=chroma_path, embedding_function=embedding_function)
+        
+        num_docs_to_include = db._collection.count()
+        results = db.similarity_search_with_score(summary, k=num_docs_to_include)
+        
+        if not results:
+            return "No relevant context found to create the prompt template."
+        
+        # Combine the retrieved contexts
+        context_text = "\n\n---\n\n".join([doc.page_content for doc, _ in results])
+        
+        # Format the dynamic prompt template
+        formatted_prompt = ChatPromptTemplate.from_template(prompt_template).format(
+            context=context_text,
+            question_base=question_base,
+            example_prompt=example_prompt
+        )
+        
+        # Query the LLM for a dynamic prompt
+        model = OllamaLLM(model="llama3.2:3b")
+        dynamic_prompt = model.invoke(formatted_prompt).strip()
+        
+        # Format the query for question generation
+        question_format = example_prompt_templates[question_type]["question_format"]
+        query_text = f"{question_format}\n\n{dynamic_prompt}"
+        
+        return query_text
+    
+    except Exception as e:
+        print(f"Error generating dynamic prompt template: {e}")
+        return "Error generating prompt template."
+
+
+def get_summary_of_all_documents(max_docs=None):
+    """
+    Summarize the content of all documents in the Chroma database.
+
+    Args:
+        max_docs (int, optional): Limit the number of documents to include in the summary. Defaults to None.
+
+    Returns:
+        str: A summary of all documents in the database.
+    """
+    try:
+        # Connect to the Chroma database
+        db = Chroma(persist_directory=CHROMA_FOLDER_PATH, embedding_function=get_embeddings_function())
+
+        # Fetch all documents
+        all_documents = db.get(include=["documents"])
+        total_docs = len(all_documents["documents"])
+
+        # Limit the number of documents if max_docs is provided
+        if max_docs is not None and max_docs < total_docs:
+            documents = all_documents["documents"][:max_docs]
+        else:
+            documents = all_documents["documents"]
+
+        # Combine content from all documents
+        combined_content = "\n\n---\n\n".join(documents)
+
+        # Create a prompt for summarization
+        summary_prompt = f"Summarize the following content in 5 sentences:\n\n{combined_content}"
+
+        # Use the LLM to generate the summary
+        model = OllamaLLM(model="llama3.2:3b")
+        summary = model.invoke(summary_prompt).strip()
+        
+        return summary
+
+    except Exception as e:
+        print(f"Error generating summary of documents: {e}")
+        return "An error occurred while summarizing the documents."
+
 
 def save_questions_to_docx(questions_and_answers):
     """
@@ -490,7 +584,6 @@ def save_questions_to_docx(questions_and_answers):
     except Exception as e:
         print(f"Error saving questions to DOCX: {str(e)}")
         raise RuntimeError("Failed to save questions to file.")
-
 
 
 def reset_database(chroma_path=CHROMA_FOLDER_PATH):

@@ -1,4 +1,4 @@
-PROMPT_TEMPLATE = """
+PROMPT_TEMPLATE_FOR_QUESTIONS = """
 Answer the question based only on the following context:
 
 {context}
@@ -6,6 +6,18 @@ Answer the question based only on the following context:
 ---
 
 Answer the question based on the above context: {question}
+"""
+
+PROMPT_TEMPLATE_FOR_PROMPTS = """
+Based on the following context:
+
+{context}
+
+---
+
+Create a concise and single instruction for generating a question as {question_base}. 
+The instruction must describe how the question tests the reader based on the above context and be exactly similar to: '{example_prompt}'. 
+Do not include examples, formatting, or additional details—return only the instruction sentence.
 """
 
 ALLOWED_EXTENSIONS = {'pdf', 'txt', 'doc', 'docx'}
@@ -28,7 +40,7 @@ question_types = [
         "Open-Ended Problem Solving"
     ]
 
-prompt_templates = {
+example_prompt_templates = {
     "True/False": {
         "question_format": """Generate a True/False question in the following format:
             - Question: True or False? [Write a statement here that can be answered as True or False.]
